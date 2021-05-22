@@ -110,7 +110,7 @@ class HTTPPROXY:
 
 class HTTPSPROXY:
     def __init__(self, websocket):
-        self.CERT_DIR = getcwd() + "\\cert\\"
+        self.CERT_DIR = getcwd() + "/cert/"
         self.CA_CERT_NAME = "Ndroid.pem"
         self.config = ""
         self.isDev = True
@@ -123,7 +123,7 @@ class HTTPSPROXY:
         self.config = loads(config_path)
 
     def check_ca_auth(self):
-        ca_file = self.CERT_DIR + "ca\\"
+        ca_file = self.CERT_DIR + "ca/"
         if path.isdir(ca_file):
             pass
         else:
