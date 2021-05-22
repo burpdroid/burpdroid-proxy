@@ -13,7 +13,7 @@ cert_dir = "./cert"
 
 @app.route("/style.css")
 def read_css():
-    with open(os.getcwd() + "/templates/bootstrap.min-lux.css", "r") as file:
+    with open("/data/data/com.termux/files/usr/var/burpdroid-proxy/templates/bootstrap.min-lux.css", "r") as file:
         return Response(file.read(), mimetype='text/css')
 
 
