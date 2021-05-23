@@ -3,7 +3,6 @@ from BurpDroid import HTTPSPROXY
 import socketio
 from flask import Flask, render_template, Response, send_file
 import os
-from gevent.pywsgi import WSGIServer
 
 app = Flask(__name__)
 sio = socketio.Server(async_mode='threading')
