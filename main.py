@@ -3,17 +3,19 @@ from BurpDroid import HTTPSPROXY
 import socketio
 from flask import Flask, render_template, Response, send_file
 import os
+from gevent.pywsgi import WSGIServer
 
 app = Flask(__name__)
 sio = socketio.Server(async_mode='threading')
 app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
 Proxy = HTTPSPROXY(sio)
-cert_dir = "./cert"
+INSTALLED_DIR = "/data/data/com.termux/files/usr/var/burpdroid-proxy/"
+cert_dir = INSTALLED_DIR + "cert"
 
 
 @app.route("/style.css")
 def read_css():
-    with open("/data/data/com.termux/files/usr/var/burpdroid-proxy/templates/bootstrap.min-lux.css", "r") as file:
+    with open(INSTALLED_DIR + "templates/bootstrap.min-lux.css", "r") as file:
         return Response(file.read(), mimetype='text/css')
 
 
@@ -74,7 +76,7 @@ def ca():
 
 @app.route('/ca/Ndroid.pem')
 def ca_download():
-    return send_file("./cert/ca/Ndroid.pem")
+    return send_file(INSTALLED_DIR + "cert/ca/Ndroid.pem")
 
 
 @sio.on('message')
@@ -112,4 +114,4 @@ def remove_old_cert():
 
 if __name__ == '__main__':
     start_new_thread(Start_Proxy, ())
-    app.run(host="127.0.0.1", port=5000)
+    app.run(host="127.0.0.1", port=5000, threaded=True)
