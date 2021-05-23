@@ -110,7 +110,8 @@ class HTTPPROXY:
 
 class HTTPSPROXY:
     def __init__(self, websocket):
-        self.CERT_DIR = getcwd() + "/cert/"
+        INSTALLED_DIR = "/data/data/com.termux/files/usr/var/burpdroid-proxy"
+        self.CERT_DIR = INSTALLED_DIR + "/cert/"
         self.CA_CERT_NAME = "Ndroid.pem"
         self.config = ""
         self.isDev = True
