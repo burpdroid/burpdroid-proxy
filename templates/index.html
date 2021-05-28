@@ -4,16 +4,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="/manifest.json" />
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="style.css" />
-    <!-- <link
+    <!-- <link rel="stylesheet" href="bootstrap.min-dark.css" /> -->
+    <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
       crossorigin="anonymous"
-    /> -->
+    />
     <title>BurpDroid</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
   </head>
   <body style="overflow: hidden">
     <!-- <ul id="messages"></ul>
@@ -38,22 +37,22 @@
         <div class="collapse navbar-collapse" id="navbarColor01">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link active" href="/"
+              <a class="nav-link active" href="/index.html"
                 >Interceptor
                 <span class="visually-hidden">(current)</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/Intruder">Intruder</a>
+              <a class="nav-link" href="/Intruder.html">Intruder</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/Repeater">Repeater</a>
+              <a class="nav-link" href="/Repeater.html">Repeater</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/About">Help</a>
+              <a class="nav-link" href="/About.html">Help</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/ca">Download Ca</a>
+              <a class="nav-link" href="/ca.html">Download Ca</a>
             </li>
           </ul>
         </div>
@@ -79,7 +78,7 @@
         </div>
         <div>
           <button type="button" class="btn btn-success btn-sm" id="capture">
-            Capture OFF
+            Capture ON
           </button>
         </div>
         <button
@@ -110,28 +109,37 @@
       integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
       crossorigin="anonymous"
     ></script>
+    <script type="text/javascript" src="/eel.js"></script>
     <script type="text/javascript">
       $(document).ready(function () {
-        var Capture = false;
-        var socket = io.connect("http://127.0.0.1:5000");
+        var Capture = true;
 
-        socket.on("connect", function () {
-          socket.emit("message", "User has connected!");
-        });
+        eel.expose(setCapptureJS);
+        function setCapptureJS(x) {
+          Capture = x;
+          if (x === true) {
+            $("#capture").html("Capture ON");
+          } else {
+            $("#capture").html("Capture OFF");
+          }
+        }
 
-        socket.on("MyResponse", function (request) {
+        eel.getCapture()(setCapptureJS);
+
+        eel.expose(recive_browserData);
+        function recive_browserData(request) {
           console.log(request.substring(2, request.length - 2));
           $("#response").val(request.substring(2, request.length - 2));
           console.log("Received message");
-        });
+        }
 
         $("#sendbutton").on("click", function () {
-          socket.emit("ProxyResponse", $("#response").val());
+          eel.getData($("#response").val());
           $("#response").val("");
         });
 
         $("#dropButton").on("click", function () {
-          socket.emit("ProxyResponse", "drop");
+          eel.getData("drop");
           $("#response").val("");
         });
 
@@ -139,11 +147,16 @@
           if (Capture) {
             Capture = false;
             $("#capture").html("Capture OFF");
+            eel.changeCapture();
           } else {
             Capture = true;
             $("#capture").html("Capture ON");
+            eel.changeCapture();
+            console.log(Capture);
+            eel.getCapture()(function (a) {
+              console.log(a);
+            });
           }
-          socket.emit("Capture", Capture);
         });
       });
     </script>

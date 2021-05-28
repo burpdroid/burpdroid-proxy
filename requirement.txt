@@ -1,5 +1,4 @@
 certauth
 cprint
-flask
-python-socketio
 pyOpenSSL
+Eel

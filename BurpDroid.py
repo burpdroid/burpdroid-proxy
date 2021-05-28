@@ -6,6 +6,7 @@ from OpenSSL import crypto
 from OpenSSL.SSL import FILETYPE_PEM
 # from HttpProxy import HTTPPROXY
 from os import lseek, path, makedirs, getcwd
+from select import select
 from cprint import *
 from json import loads
 from sys import exit
@@ -17,7 +18,7 @@ class HTTPPROXY:
         self.buffer_size = 4096
         self.websocket = websocket
         self.ModifedResponse = ""
-        self.Capture = False
+        self.Capture = True
 
     def handle_request(self, client, firstrequest, host):
         head = self.parse_head(firstrequest)
@@ -40,12 +41,13 @@ class HTTPPROXY:
         client.close()
 
     def ReciveModifedRequestHTTP(self, data):
-        self.websocket.emit("MyResponse", data)
+        self.websocket.recive_browserData(data)
         while True:
             if self.ModifedResponse != "" and self.ModifedResponse != "drop":
                 return self.ModifedResponse.encode()
             elif self.ModifedResponse == "drop":
                 return "drop"
+            time.sleep(0.5)
 
     def setData(self, data):
         self.ModifedResponse = data
@@ -110,7 +112,7 @@ class HTTPPROXY:
 
 class HTTPSPROXY:
     def __init__(self, websocket):
-        INSTALLED_DIR = "/data/data/com.termux/files/usr/var/burpdroid-proxy"
+        INSTALLED_DIR = "/data/data/com.termux/files/usr/var/burpdroid-proxy/templates"
         self.CERT_DIR = INSTALLED_DIR + "/cert/"
         self.CA_CERT_NAME = "Ndroid.pem"
         self.config = ""
@@ -118,7 +120,7 @@ class HTTPSPROXY:
         self.websocket = websocket
         self.ModifedResponse = ""
         self.HTTPPROXY = HTTPPROXY(websocket)
-        self.Capture = False
+        self.Capture = True
 
     def set_config(self, config_path="config.json"):
         self.config = loads(config_path)
@@ -164,7 +166,7 @@ class HTTPSPROXY:
                     data += datax
                     begin = time.time()
                 else:
-                    time.sleep(0.1)
+                    break
             except:
                 pass
         return data
@@ -184,17 +186,20 @@ class HTTPSPROXY:
         self.ModifedResponse = ""
 
     def ReciveModifedRequest(self, formated_request):
-        self.websocket.emit("MyResponse", formated_request)
+        self.websocket.recive_browserData(formated_request)
         while True:
             if self.ModifedResponse != "" and self.ModifedResponse != "drop":
                 return self.ModifedResponse.encode()
             elif self.ModifedResponse == "drop":
                 return "drop"
+            time.sleep(0.5)
 
     def request_handler(self, conn, tunn, request):
+        conn.setblocking(False)
+        datax = b""
         while True:
             data = self.recv_timeout(conn)
-            if data:
+            if len(data) != 0:
                 try:
                     if request and self.Capture:
                         formated_request = ""
@@ -251,7 +256,9 @@ class HTTPSPROXY:
     def handle(self, conn, ca):
         conn_s = ""
         request = conn.recv(40960)
+        print(request)
         host, port = self.request_to_host(request)
+        print(host, port)
         if host == "":
             return 0
         if port == 443:
@@ -269,11 +276,11 @@ class HTTPSPROXY:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(('127.0.0.1', 8080))
-        sock.listen(1)
+        sock.listen()
         ca = self.check_ca_auth()
         while True:
             conn, addr = sock.accept()
-            conn.settimeout(2)
+            # conn.settimeout(2)
             cprint.info("connected ===> " + str(addr))
             try:
                 self.handle(conn, ca)

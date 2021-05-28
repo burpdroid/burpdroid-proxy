@@ -4,13 +4,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="/manifest.json" />
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="style.css" />
-    <!-- <link
+    <!-- <link rel="stylesheet" href="bootstrap.min-dark.css" /> -->
+    <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
       crossorigin="anonymous"
-    /> -->
+    />
     <title>BurpDroid</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
@@ -38,22 +38,22 @@
         <div class="collapse navbar-collapse" id="navbarColor01">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/"
+              <a class="nav-link active" href="/index.html"
                 >Interceptor
                 <span class="visually-hidden">(current)</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/Intruder">Intruder</a>
+              <a class="nav-link" href="/Intruder.html">Intruder</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/Repeater">Repeater</a>
+              <a class="nav-link" href="/Repeater.html">Repeater</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/About">Help</a>
+              <a class="nav-link" href="/About.html">Help</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="/ca">Download Ca <span class="visually-hidden">(current)</span></a>
+              <a class="nav-link" href="/ca.html">Download Ca</a>
             </li>
           </ul>
         </div>
@@ -74,7 +74,7 @@
     </button>
   </div>
   <div>
-    <a href="/ca/Ndroid.pem">
+    <a onclick="returnPath()">
     <button type="button" class="btn btn-primary">Download</button>
   </a>
   </div>
@@ -87,5 +87,23 @@
       integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
       crossorigin="anonymous"
     ></script>
+    <script type="text/javascript" src="/eel.js"></script>
+    <script type="text/javascript">
+        var path;
+        eel.expose(reciveCert);
+        function reciveCert(x) {
+          path = x
+        }
+        function returnPath() {
+          var file_path = path;
+          var a = document.createElement('A');
+          a.href = file_path;
+          a.download = file_path.substr(file_path.lastIndexOf('/') + 1);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+        eel.getCert()(reciveCert);
+    </script>
   </body>
 </html>
